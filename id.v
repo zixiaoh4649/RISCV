@@ -5,20 +5,18 @@ module id(
 	input wire [31:0] ins,
 	
 	//between id and regs
-	output wire [4:0] rs1_addr,
-	output wire [4:0] rs2_addr,
+	output reg [4:0] rs1_addr,
+	output reg [4:0] rs2_addr,
 	input wire [31:0] rs1_data,
 	input wire [31:0] rs2_data,
 	
 	//output to id_ex
-	output wire [4:0] op1,
-	output wire [4:0] op2,
-	output wire [4:0] rs1_o,	//?
-	output wire [4:0] rs2_o,	//?
-	output wire [31:0] ins2ex,
-	output wire [31:0] ins_addr,
-	output wire [4:0] rd_addr,
-	output wire 	  rd_wen
+	output reg [31:0] op1,
+	output reg [31:0] op2,
+	output reg [31:0] ins2ex,
+	output reg [31:0] ins_addr,
+	output reg [4:0] rd_addr,
+	output reg 	  rd_wen
 			
 );
 	
