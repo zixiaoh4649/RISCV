@@ -15,7 +15,7 @@ module id(
 	output reg [31:0] op2,
 	output reg [31:0] ins2ex,
 	output reg [31:0] ins_addr,
-	output reg [4:0] rd_addr,
+	output reg [4:0] rd_addr,    //?
 	output reg 	  rd_wen
 			
 );
