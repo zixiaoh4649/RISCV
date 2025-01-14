@@ -15,8 +15,9 @@ module id(
 	output reg [31:0] op2,
 	output reg [31:0] ins2ex,
 	output reg [31:0] ins_addr,
-	output reg [4:0] rd_addr,    //?
-	output reg 	  rd_wen
+	output reg [4:0]  rd_addr,    //?
+	output reg 	      rd_wen,
+	output reg [4:0]  oh
 			
 );
 	
@@ -26,6 +27,7 @@ module id(
 	wire [4:0] rs1;
 	wire [4:0] rs2;
 	wire [11:0] imm_i;
+	wire [6:0] f7;
 
 	//I type
 	assign opcode=ins[6:0];
@@ -33,6 +35,9 @@ module id(
 	assign f3    =ins[14:12];
 	assign rs1   =ins[19:15];
 	assign imm_i =ins[31:20];
+	
+	//R type
+	assign f7    =ins[31:25];
 
 
 
@@ -44,8 +49,9 @@ module id(
 		case(opcode)
 			7'b0010011: begin	//I type 
 				case(f3) 
-					000:begin	//ADDI
-						op1	    =rs1;
+					3'b000:begin	//ADDI
+						oh  =5'd1;
+						op1	    =rs1_data;
 						op2     ={{20{imm_i[11]}},imm_i};
 						rs1_addr=rs1;
 						rs2_addr=5'b0;
@@ -53,8 +59,9 @@ module id(
 						rd_wen  =1'b1;
 					end
 					default:begin
-						op1=32'b0;
-						op2=32'b0;
+						oh  =5'b0;
+						op1		=32'b0;
+						op2		=32'b0;
 						rs1_addr=5'b0;
 						rs2_addr=5'b0;
 						rd_addr =5'b0;
@@ -63,8 +70,64 @@ module id(
 				endcase
 			end
 			
+			7'b0110011:begin //R type
+				case(f3)
+					3'b000:begin
+						case(f7)
+							7'b0000000:begin //ADD
+								oh  =5'd2;
+								op1	    =rs1_data;
+								op2     =rs2_data;
+								rs1_addr=rs1;
+								rs2_addr=rs2;
+								rd_addr =rd;
+								rd_wen  =1'b1;
+							end
+							
+							7'b0100000:begin //SUB
+								oh  =5'd3;
+								op1	    =rs1_data;
+								op2     =rs2_data;
+								rs1_addr=rs1;
+								rs2_addr=rs2;
+								rd_addr =rd;
+								rd_wen  =1'b1;
+							end
+							
+							
+							default:begin
+								oh  =5'b0;
+								op1		=32'b0;
+								op2		=32'b0;
+								rs1_addr=5'b0;
+								rs2_addr=5'b0;
+								rd_addr =5'b0;
+								rd_wen  =1'b0;	
+							end
+						endcase
+					end
+					default:begin
+						oh  =5'b0;
+						op1		=32'b0;
+						op2		=32'b0;
+						rs1_addr=5'b0;
+						rs2_addr=5'b0;
+						rd_addr =5'b0;
+						rd_wen  =1'b0;	
+					end 
+					
+				endcase
+			end
+			
 			
 			default:begin
+				oh  =5'b0;
+				op1		=32'b0;
+				op2		=32'b0;
+				rs1_addr=5'b0;
+				rs2_addr=5'b0;
+				rd_addr =5'b0;
+				rd_wen  =1'b0;	
 			end							
 		
 		endcase//type
