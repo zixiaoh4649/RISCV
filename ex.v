@@ -1,6 +1,6 @@
 module ex(
 	input wire [31:0] ins,
-	input wire [31:0] ins_add2ex,
+	input wire [31:0] ins_addr2ex,
 	input wire [31:0] op1,    //op1_ex
 	input wire [31:0] op2,    //op2_ex
 	input wire [4:0]  rd_addr2ex, 
