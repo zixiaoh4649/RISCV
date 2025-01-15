@@ -26,8 +26,8 @@ module riscv(
     //from id to regs
     wire [4:0]  rs1_addr_regs;
     wire [4:0]  rs2_addr_regs;
-    wire [4:0]  rs1_data;
-    wire [4:0]  rs2_data;
+    wire [31:0]  rs1_data;
+    wire [31:0]  rs2_data;
 
     //from id
     wire [31:0] ins2ex;
@@ -45,7 +45,7 @@ module riscv(
     wire [31:0] ins_addr2ex;
     wire [31:0] ins_ex_i;
     wire [4:0]  rd_addr_ex;
-    wire [31:0] rd_wen_ex;
+    wire        rd_wen_ex;
     wire [4:0]  oh_ex;
     //to ex
 
@@ -133,7 +133,7 @@ module riscv(
 	    .ins_addr2ex(ins_addr2ex),
 	    .op1       (op1_ex),    
 	    .op2       (op2_ex),    
-	    .rd_addr2ex(rd_addr2ex), 
+	    .rd_addr2ex(rd_addr_ex), 
 	    .rd_wen    (rd_wen_ex),  
 	    .oh        (oh_ex),
         //output

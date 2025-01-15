@@ -38,6 +38,7 @@ module id(
 	
 	//R type
 	assign f7    =ins[31:25];
+	assign rs2   =ins[24:20];
 
 
 
