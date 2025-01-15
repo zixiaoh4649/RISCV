@@ -1,4 +1,4 @@
-module(
+module riscv(
     input wire clki,
     input wire rsti,
 
