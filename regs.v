@@ -15,7 +15,6 @@ module regs(
 	output reg [31:0] rs1_data,
 	output reg [31:0] rs2_data
 	
-	
 );
 
 	reg [31:0] regs [0:31];

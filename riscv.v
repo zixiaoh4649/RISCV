@@ -7,11 +7,6 @@ module riscv(
 );
 
     wire [31:0] pc_o;
-    pc_reg pc_reg_inst (
-        .clk (clki),
-        .rst (rsti),
-        .pc_o(pc_o)
-    );
 
     //from ifetch 
     wire [31:0] ins2id;
@@ -54,6 +49,26 @@ module riscv(
     wire [31:0] rd_data_o;
     wire        rd_wen_o;
 
+    //from ex to ctrl
+    wire        hold2ctrl;
+    wire        jump_en2ctrl;
+    wire [31:0] jump_addr2ctrl;
+
+    //from ctrl to other
+    wire        hold;
+    wire        jump_en;
+    wire [31:0] jump_addr;
+
+
+
+    pc_reg pc_reg_inst (
+        .clk        (clki),
+        .rst        (rsti),
+        .pc_o       (pc_o),
+        .hold       (hold),
+	    .jump_addr  (jump_addr),
+	    .jump_en    (jump_en)
+    );
 
     ifetch ifetch_inst (
         .pc_o    (pc_o),
@@ -71,7 +86,8 @@ module riscv(
         .ins2id     (ins2id),
         .ins_addr   (ins_addr),
         .ins_addr2id(ins_addr2id),
-        .ins        (ins) 
+        .ins        (ins),
+        .hold       (hold)
     );
 
 
@@ -123,25 +139,40 @@ module riscv(
         .ins_addr2ex (ins_addr2ex),
         .rd_addr2ex  (rd_addr_ex),
         .rd_wen2ex   (rd_wen_ex),
-        .oh          (oh_ex)
+        .oh          (oh_ex),
+        .hold        (hold)
+
     );
 
-
+ 
     ex ex_inst(
         //input
-	    .ins       (ins_ex_i),
-	    .ins_addr2ex(ins_addr2ex),
-	    .op1       (op1_ex),    
-	    .op2       (op2_ex),    
-	    .rd_addr2ex(rd_addr_ex), 
-	    .rd_wen    (rd_wen_ex),  
-	    .oh        (oh_ex),
-        //output
-	    .rd_addr   (rd_addr_ex2regs),
-	    .rd_data   (rd_data_o),
-	    .rd_wen2reg(rd_wen_o)
+	    .ins            (ins_ex_i),
+	    .ins_addr2ex    (ins_addr2ex),
+	    .op1            (op1_ex),    
+	    .op2            (op2_ex),    
+	    .rd_addr2ex     (rd_addr_ex), 
+	    .rd_wen         (rd_wen_ex),  
+	    .oh             (oh_ex),
+        //output        
+	    .rd_addr        (rd_addr_ex2regs),
+	    .rd_data        (rd_data_o),
+	    .rd_wen2reg     (rd_wen_o),
+        .jump_addr2ctrl (jump_addr2ctrl),
+        .jump_en2ctrl   (jump_en2ctrl),
+        .hold2ctrl      (hold2ctrl)    
+    
     );
 
+
+    ctrl ctrl_inst(
+        .hold2ctrl      (hold2ctrl),
+        .jump_en2ctrl   (jump_en2ctrl),
+        .jump_addr2ctrl (jump_addr2ctrl),
+        .hold           (hold),
+        .jump_en        (jump_en),
+        .jump_addr      (jump_addr)
+    );
 
 
 endmodule
