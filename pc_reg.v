@@ -5,7 +5,7 @@ module pc_reg (
 
 	//jump
 	input wire hold,
-	input wire jump_addr,
+	input wire [31:0] jump_addr,
 	input wire jump_en
 ); 
 
