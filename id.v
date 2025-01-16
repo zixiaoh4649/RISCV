@@ -44,8 +44,6 @@ module id(
 
 
 
-
-
 	always @(*) begin
 		
 		ins2ex  =ins;

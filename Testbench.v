@@ -18,18 +18,36 @@ module Testbench;
 
 
 	initial begin
-		$readmemb("ins.txt", Testbench.RISCV_soc_inst.rom_inst.rom_mem);
+		$readmemh(".\inst_txt\rv32ui-p-add.txt", Testbench.RISCV_soc_inst.rom_inst.rom_mem);
 	end
 
+
+	wire x3  = Testbench.RISCV_soc_inst.riscv_inst.regs_inst.regs[3];
+	wire x26 = Testbench.RISCV_soc_inst.riscv_inst.regs_inst.regs[26];
+	wire x27 = Testbench.RISCV_soc_inst.riscv_inst.regs_inst.regs[27];
+	integer i;
 
 	initial begin
 		while(1)begin
 			@(posedge clk)
-			$display("x27 is %d", Testbench.RISCV_soc_inst.riscv_inst.regs_inst.regs[27]);
-			$display("x28 is %d", Testbench.RISCV_soc_inst.riscv_inst.regs_inst.regs[28]);
-			$display("x29 is %d", Testbench.RISCV_soc_inst.riscv_inst.regs_inst.regs[29]);
-			$display("<-------------------->");
-			$display("<-------------------->");
+			// $display("x27 is %d", Testbench.RISCV_soc_inst.riscv_inst.regs_inst.regs[27]);
+			// $display("x28 is %d", Testbench.RISCV_soc_inst.riscv_inst.regs_inst.regs[28]);
+			// $display("x29 is %d", Testbench.RISCV_soc_inst.riscv_inst.regs_inst.regs[29]);
+			// $display("<-------------------->");
+			// $display("<-------------------->");
+
+			wait(x26 == 32'b1);
+			#200;
+			if(x27 == 32'b1)begin
+				$display("#########pass#########")；
+			end else begin
+				$display("#########fail#########");
+				for(i=0;i<32;i=i+1)begin
+					$display("x%2d is %d", i, Testbench.RISCV_soc_inst.riscv_inst.regs_inst.regs[i]);
+				end
+
+			end
+
 		end
 
 	end
