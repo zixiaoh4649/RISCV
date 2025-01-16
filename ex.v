@@ -8,7 +8,7 @@ module ex(
 	input wire [4:0]  oh,
 	output reg [4:0]  rd_addr,
 	output reg [31:0] rd_data,
-	output reg        rd_wen2reg
+	output reg        rd_wen2reg,
 
 	//to ctrl
 	output reg [31:0] jump_addr2ctrl,
@@ -18,7 +18,7 @@ module ex(
 
 	//B type
 	wire   [31:0] imm_jump;
-	assign imm_jump = {19{ins[31]},ins[31], ins[7], ins[30:25], ins[11:8], 1'b0};
+	assign imm_jump = {{19{ins[31]}},ins[31], ins[7], ins[30:25], ins[11:8], 1'b0};
 	wire   op1_equal_op2;
 	assign op1_equal_op2 = (op1 == op2)? 1'b1:1'b0;
 
@@ -80,7 +80,7 @@ module ex(
 
 			//J type
 			5'd5:begin //Jal
-				jump_addr2ctrl = ins_addr2ex + {12{ins[31]}, ins[31], ins[19:12], ins[20], ins[30:21], 1'b0};
+				jump_addr2ctrl = ins_addr2ex + {{12{ins[31]}}, ins[31], ins[19:12], ins[20], ins[30:21], 1'b0};
 				hold2ctrl	   = 1'b0;
 				rd_data		   = ins_addr2ex + 32'd4;
 				rd_addr        = rd_addr2ex;

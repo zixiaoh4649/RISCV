@@ -156,7 +156,7 @@ module id(
 
 			//U type
 			7'b0110111:begin
-				oh  	=5'b7;
+				oh  	=5'd7;
 				op1		=32'b0;
 				op2		=32'b0;
 				rs1_addr=5'b0;

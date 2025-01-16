@@ -1,10 +1,10 @@
 module ctrl(
-	input  wire 		hold2ctrl;
-	input  wire 		jump_en2ctrl;
-	input  wire [31:0] 	jump_addr2ctrl;
-	output reg 			hold;
-	output reg 			jump_en;
-	output reg [31:0]  	jump_addr;
+	input  wire 		hold2ctrl		,
+	input  wire 		jump_en2ctrl	,
+	input  wire [31:0] 	jump_addr2ctrl	,
+	output reg 			hold			,
+	output reg 			jump_en			,
+	output reg [31:0]  	jump_addr
 );
 
 	always @(*) begin
