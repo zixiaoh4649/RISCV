@@ -222,7 +222,7 @@ module ex(
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;
 			end
-			7'd35:begin //SRA ???
+			7'd35:begin //SRA
 			if (op1[31] == 1'b1) begin
 				rd_data = (op1 >> op2) | ~(32'hFFFFFFFF >> op2);
 			end else begin
@@ -238,7 +238,6 @@ module ex(
 				rd_data    = op1 & op2;
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;
-
 			end
 			//R type
 

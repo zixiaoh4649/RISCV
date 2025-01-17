@@ -113,7 +113,7 @@ module id(
 								rd_addr =rd;
 								rd_wen  =1'b1;
 							end
-							7'b0100000:begin //SRAI
+							7'b0100000:begin //SRAI 
 								oh      =7'd27;
 								op1	    =rs1_data;
 								op2     =rs2; //shamt
@@ -133,94 +133,54 @@ module id(
 
 			//R type
 			7'b0110011:begin 
+				op1	    =rs1_data;
+				op2     =rs2_data;
+				rs1_addr=rs1;
+				rs2_addr=rs2;
+				rd_addr =rd;
+				rd_wen  =1'b1;				
 				case(f3)
 					3'b000:begin
 						case(f7)
-							7'b0000000:begin //ADD
-								oh      =7'd28;
-								op1	    =rs1_data;
-								op2     =rs2_data;
-								rs1_addr=rs1;
-								rs2_addr=rs2;
-								rd_addr =rd;
-								rd_wen  =1'b1;
-							end						
-							7'b0100000:begin //SUB
-								oh      =7'd29;
-								op1	    =rs1_data;
-								op2     =rs2_data;
-								rs1_addr=rs1;
-								rs2_addr=rs2;
-								rd_addr =rd;
-								rd_wen  =1'b1;
-							end											
+							7'b0000000: oh =7'd28; //ADD
+							7'b0100000: oh =7'd29; //SUB
 						endcase
 					end
-					
+					3'b001: oh =7'd30; //SLL
+					3'b010: oh =7'd31;//SLT						
+					3'b011: oh =7'd32;//SLTU
+					3'b100: oh =7'd33;//XOR
+					3'b101:begin
+						case(f7)					
+							7'b0000000: oh =7'd34;//SRL								
+							7'b0100000: oh =7'd35;//SRA
+						endcase
+					end
+					3'b110: oh =7'd36;//OR								
+					3'b111: oh =7'd37;//AND								
 				endcase
 			end
 			//R type
 
 			//B type
-			7'b1100011:begin 
-				case(f3)
-					3'b001:begin //BNE
-						oh		=7'd6;
-						op1		=rs1_data;
-						op2		=rs2_data;
-						rs1_addr=rs1;
-						rs2_addr=rs2;
-						rd_addr =5'b0;
-						rd_wen  =1'b0;
-					end
-					3'b000:begin //BEQ
-						oh		=7'd5;
-						op1		=rs1_data;
-						op2		=rs2_data;
-						rs1_addr=rs1;
-						rs2_addr=rs2;
-						rd_addr =5'b0;
-						rd_wen  =1'b0;
-					end
-					3'b100:begin //BLT
-						oh		=7'd7;
-						op1		=rs1_data;
-						op2		=rs2_data;
-						rs1_addr=rs1;
-						rs2_addr=rs2;
-						rd_addr =5'b0;
-						rd_wen  =1'b0;
-					end
-					3'b101:begin //BGE
-						oh		=7'd8;
-						op1		=rs1_data;
-						op2		=rs2_data;
-						rs1_addr=rs1;
-						rs2_addr=rs2;
-						rd_addr =5'b0;
-						rd_wen  =1'b0;
-					end
-					3'b110:begin //BLTU
-						oh		=7'd9;
-						op1		=rs1_data;
-						op2		=rs2_data;
-						rs1_addr=rs1;
-						rs2_addr=rs2;
-						rd_addr =5'b0;
-						rd_wen  =1'b0;
-					end
-					3'b111:begin //BGEU
-						oh		=7'd10;
-						op1		=rs1_data;
-						op2		=rs2_data;
-						rs1_addr=rs1;
-						rs2_addr=rs2;
-						rd_addr =5'b0;
-						rd_wen  =1'b0;
-					end
+			7'b1100011: begin
+				op1       = rs1_data;
+				op2       = rs2_data;
+				rs1_addr  = rs1;
+				rs2_addr  = rs2;
+				rd_addr   = 5'b0;
+				rd_wen    = 1'b0;
+				oh = 7'd0; //default
+				case (f3)
+					3'b001: oh = 7'd6;  // BNE
+					3'b000: oh = 7'd5;  // BEQ
+					3'b100: oh = 7'd7;  // BLT
+					3'b101: oh = 7'd8;  // BGE
+					3'b110: oh = 7'd9;  // BLTU
+					3'b111: oh = 7'd10; // BGEU
 				endcase
 			end
-
+			
 			//U type
 			7'b0110111:begin //LUI
 				oh  	=7'd1;
