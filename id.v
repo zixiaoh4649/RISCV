@@ -29,15 +29,16 @@ module id(
 	wire [4:0]  rs2;
 	wire [11:0] imm_i;
 	wire [6:0]  f7;
-	
+	wire [31:0] mem_addr;
 
 	//I type
 	assign opcode=ins[6:0];
 	assign rd    =ins[11:7];
 	assign f3    =ins[14:12];
 	assign rs1   =ins[19:15];
-	assign imm_i =ins[31:20];
-	
+	assign mem_addr = rs1+{{20{ins[31]}}, ins[31:20]};
+
+
 	//R type
 	assign f7    =ins[31:25];
 	assign rs2   =ins[24:20];
@@ -59,76 +60,60 @@ module id(
 					 
 		case(opcode)
 
-			//I type
-			7'b0010011:begin  
-				case(f3) 
-					3'b000:begin	//ADDI
-						oh  =7'd19;
-						op1	    =rs1_data;
-						op2     ={{20{imm_i[11]}},imm_i};
-						rs1_addr=rs1;
-						rs2_addr=5'b0;
-						rd_addr =rd;
-						rd_wen  =1'b1;
-					end
-					3'b010:begin	//SLTI
-						oh  	=7'd20;
-						op1		=rs1_data;
-						op2		={{20{ins[31]}}, ins[31:20]}; //op2 as imm_i here
-						rs1_addr=rs1;
-						rs2_addr=5'b0;
-						rd_addr =rd;
-						rd_wen  =1'b1;			
-					end
-					3'b011:begin	//SLTIU
-						oh  	=7'd21;
-						op1		=rs1_data;
-						op2		={{20{ins[31]}}, ins[31:20]};
-						rs1_addr=rs1;
-						rs2_addr=5'b0;
-						rd_addr =rd;
-						rd_wen  =1'b1;			
-					end
-					3'b001:begin
-						case(f7)
-							7'b0000000:begin //SLLI
-								oh      =7'd25;
-								op1	    =rs1_data;
-								op2     =rs2;
-								rs1_addr=rs1;
-								rs2_addr=5'b0;
-								rd_addr =rd;
-								rd_wen  =1'b1;
-							end
-						endcase
-					end
-					3'b101:begin
-						case(f7)
-							7'b0000000:begin //SRLI
-								oh      =7'd26;
-								op1	    =rs1_data;
-								op2     ={{27'b0}, rs2};
-								rs1_addr=rs1;
-								rs2_addr=5'b0;
-								rd_addr =rd;
-								rd_wen  =1'b1;
-							end
-							7'b0100000:begin //SRAI 
-								oh      =7'd27;
-								op1	    =rs1_data;
-								op2     =rs2; //shamt
-								rs1_addr=rs1;
-								rs2_addr=5'b0;
-								rd_addr =rd;
-								rd_wen  =1'b1;
-							end
-						endcase
-					end
-
-
-
+			//I type and part of R type ？？？？？
+			7'b1100111:begin
+				oh 	    = 7'd4;
+				op1	    =rs1_data;
+				op2     ={{20{ins[31]}}, ins[31:20]};
+				rs1_addr=rs1;
+				rs2_addr=5'b0;
+				rd_addr =rd;
+				rd_wen  =1'b1;				
+			end
+			7'b0000011:begin
+				op1	    =rs1_data;
+				op2     =mem_addr[1:0]; //byte offset
+				rs1_addr=mem_addr[31:2]>>2;
+				rs2_addr=5'b0;
+				rd_addr =rd;
+				rd_wen  =1'b1;
+				case(f3)
+					3'b000: oh = 7'd11; //LB
+					3'b001: oh = 7'd12; //LH
+					3'b010: oh = 7'd13; //LW
+					3'b100: oh = 7'd14; //LBU
+					3'b101: oh = 7'd15; //LHUS
 				endcase
 			end
+			7'b0010011:begin  
+				op1	    =rs1_data;
+				op2     ={{20{ins[31]}}, ins[31:20]};
+				rs1_addr=rs1;
+				rs2_addr=5'b0;
+				rd_addr =rd;
+				rd_wen  =1'b1;
+				case(f3) 
+					3'b000: oh = 7'd19;	//ADDI
+					3'b010: oh = 7'd20;	//SLTI
+					3'b011: oh = 7'd21;	//SLTIU						
+					3'b001:begin 		//SLLI
+						oh =7'd25; 
+						op2 = rs2; //shamt
+					end
+					3'b101:begin
+						op2 = rs2; //shamt
+						case(f7)
+							7'b0000000: oh = 7'd26; //SRLI					
+							7'b0100000: oh = 7'd27; //SRAI 
+						endcase
+					end
+					3'b100: oh = 7'd22; //XORI
+					3'b110: oh = 7'd23; //ORI
+					3'b111: oh = 7'd24; //ANDI
+				endcase
+			end
+
+
 
 
 			//R type
@@ -184,12 +169,22 @@ module id(
 			//U type
 			7'b0110111:begin //LUI
 				oh  	=7'd1;
-				op1		=32'b0;
+				op1		={ins[31:12], 12'b0};
 				op2		=32'b0;
 				rs1_addr=5'b0;
 				rs2_addr=5'b0;
 				rd_addr =rd;
 				rd_wen  =1'b1;	
+			end
+			7'b0010111:begin //AUIPC
+				oh  	=7'd2;
+				op1		={ins[31:12], 12'b0};
+				op2		=32'b0;
+				rs1_addr=5'b0;
+				rs2_addr=5'b0;
+				rd_addr =rd;
+				rd_wen  =1'b1;	
+
 			end
 
 			//J type

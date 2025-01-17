@@ -43,11 +43,14 @@ module ex(
 
 			//U type
 			7'd1:begin //LUI
-				rd_data 	= {ins[31:12], 12'b0};
+				rd_data 	= op1;
 				rd_addr		= rd_addr2ex;
 				rd_wen2reg 	= 1'b1;
 			end
 			7'd2:begin //AUIPC
+				rd_data = ins_addr2ex + op1;
+				rd_addr		= rd_addr2ex;
+				rd_wen2reg 	= 1'b1;
 			end
 
 			//J type
@@ -59,8 +62,13 @@ module ex(
 				rd_wen2reg	   = 1'b1;
 			end
 
-			//U type
+
 			7'd4:begin //JALR
+				jump_addr2ctrl  = op1 + op2;
+				jump_en2ctrl    = 1'b1;
+				rd_data			= ins_addr2ex + 32'd4;
+				rd_addr    	 	= rd_addr2ex;
+				rd_wen2reg		= 1'b1;
 			end
 
 
@@ -103,7 +111,20 @@ module ex(
 			end
 
 			//I type
-			7'd11:begin //LB
+			7'd11:begin //LB    ？？？？？
+				case (op2)
+					2'b00: rd_data = op1[7:0];     // 第 0 字节
+					2'b01: rd_data = op1[15:8];    // 第 1 字节
+					2'b10: rd_data = op1[23:16];   // 第 2 字节
+					2'b11: rd_data = op1[31:24];   // 第 3 字节
+				endcase
+				if (rd_data[7] == 1'b1) begin
+					rd_data = {24'hFFFFFF, rd_data}; // 符号位为 1，扩展为负数
+				end else begin
+					rd_data = {24'h000000, rd_data}; // 符号位为 0，扩展为正数
+				end
+				rd_addr    = rd_addr2ex;
+				rd_wen2reg = 1'b1;
 			end 
 			7'd12:begin //LH 
 			end
@@ -141,7 +162,7 @@ module ex(
 			end
 			7'd21:begin //SLTIU
 				if($unsigned(op1) < $unsigned(op2))begin
-					rd_data = 32'b1;
+					rd_data    = 32'b1;
 					rd_addr    = rd_addr2ex;
 					rd_wen2reg = 1'b1;
 				end else begin
@@ -151,10 +172,19 @@ module ex(
 				end
 			end
 			7'd22:begin //XORI
+				rd_data    = op1 ^ op2;
+				rd_addr    = rd_addr2ex;
+				rd_wen2reg = 1'b1;
 			end
 			7'd23:begin //ORI
+				rd_data    = op1 | op2;
+				rd_addr    = rd_addr2ex;
+				rd_wen2reg = 1'b1;
 			end
 			7'd24:begin //ANDI
+				rd_data    = op1 & op2;
+				rd_addr    = rd_addr2ex;
+				rd_wen2reg = 1'b1;
 			end
 
 			//R type shamt
