@@ -168,15 +168,16 @@ module ex(
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;				
 			end
-			7'd27:begin //SRAI    ???
-				//op1 = op1 >> op2;
-				//op2 = 32'hffffffff >> op2; //op2 act as SRA_mask here
-				rd_data = (op1&op2) | ((~op2) & {32{op1[31]}});
-				//rd_data = op1 >>> op2; //this is systemverilog
+			7'd27:begin //SRAI
+			if (op1[31] == 1'b1) begin
+				rd_data = (op1 >> op2) | ~(32'hFFFFFFFF >> op2);
+			end else begin
+				rd_data = op1 >> op2;
+			end			
 				rd_addr	   =rd_addr2ex;
 				rd_wen2reg = 1'b1;				
 			end
-
+			//R type shamt
 			//R type
 			7'd28:begin //ADD
 				rd_data    = op1 + op2;
@@ -189,21 +190,57 @@ module ex(
 				rd_wen2reg = 1'b1;
 			end
 			7'd30:begin //SLL
+				rd_data    = op1 << op2;
+				rd_addr    = rd_addr2ex;
+				rd_wen2reg = 1'b1;
 			end
 			7'd31:begin //SLT
+				if($signed(op1) < $signed(op2))begin
+					rd_data = 1'b1;
+				end else begin
+					rd_data = 1'b0;
+				end
+				rd_addr    = rd_addr2ex;
+				rd_wen2reg = 1'b1;
 			end
 			7'd32:begin //SLTU
+				if($unsigned(op1) < $unsigned(op2))begin
+					rd_data = 1'b1;
+				end else begin
+					rd_data = 1'b0;
+				end
+				rd_addr    = rd_addr2ex;
+				rd_wen2reg = 1'b1;
 			end
 			7'd33:begin //XOR
+				rd_data    = op1 ^ op2;
+				rd_addr    = rd_addr2ex;
+				rd_wen2reg = 1'b1;
 			end
 			7'd34:begin //SRL
+				rd_data    = op1 >> op2;
+				rd_addr    = rd_addr2ex;
+				rd_wen2reg = 1'b1;
 			end
-			7'd35:begin //SRA
+			7'd35:begin //SRA ???
+			if (op1[31] == 1'b1) begin
+				rd_data = (op1 >> op2) | ~(32'hFFFFFFFF >> op2);
+			end else begin
+				rd_data = op1 >> op2;
+			end			
 			end
 			7'd36:begin //OR
+				rd_data    = op1 | op2;
+				rd_addr    = rd_addr2ex;
+				rd_wen2reg = 1'b1;
 			end
 			7'd37:begin //AND
+				rd_data    = op1 & op2;
+				rd_addr    = rd_addr2ex;
+				rd_wen2reg = 1'b1;
+
 			end
+			//R type
 
 
 			

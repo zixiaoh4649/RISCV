@@ -113,10 +113,10 @@ module id(
 								rd_addr =rd;
 								rd_wen  =1'b1;
 							end
-							7'b0100000:begin //SRAI   ???
+							7'b0100000:begin //SRAI
 								oh      =7'd27;
-								op1	    =rs1_data >> rs2;
-								op2     =32'hffffffff >> rs2; //act as SRA_mask here
+								op1	    =rs1_data;
+								op2     =rs2; //shamt
 								rs1_addr=rs1;
 								rs2_addr=5'b0;
 								rd_addr =rd;
