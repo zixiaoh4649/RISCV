@@ -22,9 +22,7 @@ module ex(
 	wire   op1_equal_op2;
 	assign op1_equal_op2 = (op1 == op2)? 1'b1:1'b0;
 
-	wire [31:0] imm_i;
-	//I type
-	//assign imm_i ={{20{imm_i[11]}},imm_i};
+
 
 	//J type
 	//wire   [31:0] imm_jal;
@@ -45,13 +43,15 @@ module ex(
 
 			//U type
 			7'd1:begin //LUI
-				rd_data = {ins[31:12], 12'b0};
+				rd_data 	= {ins[31:12], 12'b0};
+				rd_addr		= rd_addr2ex;
+				rd_wen2reg 	= 1'b1;
 			end
 			7'd2:begin //AUIPC
 			end
 
 			//J type
-			7'd3:begin //Jal
+			7'd3:begin //Jal  needs auipc
 				jump_addr2ctrl = ins_addr2ex + {{12{ins[31]}}, ins[31], ins[19:12], ins[20], ins[30:21], 1'b0};
 				hold2ctrl	   = 1'b0;
 				rd_data		   = ins_addr2ex + 32'd4;
@@ -119,13 +119,25 @@ module ex(
 				rd_wen2reg = 1'b1;
 			end
 			7'd20:begin //SLTI
-				if($signed(op1) < $signed({{20{imm_i[11]}},imm_i}))begin
-					rd_data = 32'b1;
+				if($signed(op1) < $signed(op2))begin
+					rd_data    = 32'b1;
+					rd_addr    = rd_addr2ex;
+					rd_wen2reg = 1'b1;
+				end else begin
+					rd_data    = 32'b0;
+					rd_addr    = rd_addr2ex;
+					rd_wen2reg = 1'b1;
 				end
 			end
 			7'd21:begin //SLTIU
-				if($unsigned(op1) < $unsigned({20'b0,imm_i}))begin
+				if($unsigned(op1) < $unsigned(op2))begin
 					rd_data = 32'b1;
+					rd_addr    = rd_addr2ex;
+					rd_wen2reg = 1'b1;
+				end else begin
+					rd_data    = 32'b0;
+					rd_addr    = rd_addr2ex;
+					rd_wen2reg = 1'b1;
 				end
 			end
 			7'd22:begin //XORI
@@ -146,11 +158,12 @@ module ex(
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;				
 			end
-			7'd27:begin //SRAI
-				// op1 = op1 >> op2;
-				// op2 = 32'hffffffff >> op2; //op2 act as SRA_mask here
-				// rd_data = (op1&op2) | (~op2 & {32{op1[31]}});
-				rd_data = op1 >>> op2;
+			7'd27:begin //SRAI    ???
+				//op1 = op1 >> op2;
+				//op2 = 32'hffffffff >> op2; //op2 act as SRA_mask here
+				rd_data = (op1&op2) | ((~op2) & {32{op1[31]}});
+				//rd_data = op1 >>> op2; //this is systemverilog
+				rd_addr	   =rd_addr2ex;
 				rd_wen2reg = 1'b1;				
 			end
 

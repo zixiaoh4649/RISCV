@@ -73,8 +73,8 @@ module id(
 					end
 					3'b010:begin	//SLTI
 						oh  	=7'd20;
-						op1		=32'b0;
-						op2		=32'b0;
+						op1		=rs1_data;
+						op2		={{20{ins[31]}}, ins[31:20]}; //op2 as imm_i here
 						rs1_addr=rs1;
 						rs2_addr=5'b0;
 						rd_addr =rd;
@@ -82,13 +82,50 @@ module id(
 					end
 					3'b011:begin	//SLTIU
 						oh  	=7'd21;
-						op1		=32'b0;
-						op2		=32'b0;
+						op1		=rs1_data;
+						op2		={{20{ins[31]}}, ins[31:20]};
 						rs1_addr=rs1;
 						rs2_addr=5'b0;
 						rd_addr =rd;
 						rd_wen  =1'b1;			
 					end
+					3'b001:begin
+						case(f7)
+							7'b0000000:begin //SLLI
+								oh      =7'd25;
+								op1	    =rs1_data;
+								op2     =rs2;
+								rs1_addr=rs1;
+								rs2_addr=5'b0;
+								rd_addr =rd;
+								rd_wen  =1'b1;
+							end
+						endcase
+					end
+					3'b101:begin
+						case(f7)
+							7'b0000000:begin //SRLI
+								oh      =7'd26;
+								op1	    =rs1_data;
+								op2     ={{27'b0}, rs2};
+								rs1_addr=rs1;
+								rs2_addr=5'b0;
+								rd_addr =rd;
+								rd_wen  =1'b1;
+							end
+							7'b0100000:begin //SRAI   ???
+								oh      =7'd27;
+								op1	    =rs1_data >> rs2;
+								op2     =32'hffffffff >> rs2; //act as SRA_mask here
+								rs1_addr=rs1;
+								rs2_addr=5'b0;
+								rd_addr =rd;
+								rd_wen  =1'b1;
+							end
+						endcase
+					end
+
+
 
 				endcase
 			end
@@ -119,44 +156,6 @@ module id(
 							end											
 						endcase
 					end
-					3'b001:begin
-						case(f7)
-							7'b0000000:begin //SLLI
-								oh      =7'd25;
-								op1	    =rs1_data;
-								op2     =rs2;
-								rs1_addr=rs1;
-								rs2_addr=5'b0;
-								rd_addr =rd;
-								rd_wen  =1'b1;
-							end
-						endcase
-					end
-					3'b101:begin
-						case(f7)
-							7'b0000000:begin //SRLI
-								oh      =7'd26;
-								op1	    =rs1_data;
-								op2     ={{27'b0}, rs2};
-								rs1_addr=rs1;
-								rs2_addr=5'b0;
-								rd_addr =rd;
-								rd_wen  =1'b1;
-							end
-							7'b0100000:begin //SRAI
-								oh      =7'd27;
-								op1	    =rs1_data;
-								op2     ={{27'b0}, rs2};
-								rs1_addr=rs1;
-								rs2_addr=5'b0;
-								rd_addr =rd;
-								rd_wen  =1'b1;
-							end
-							
-
-
-						endcase
-					end
 					
 				endcase
 			end
@@ -174,9 +173,17 @@ module id(
 						rd_addr =5'b0;
 						rd_wen  =1'b0;
 					end
-
 					3'b000:begin //BEQ
 						oh		=7'd5;
+						op1		=rs1_data;
+						op2		=rs2_data;
+						rs1_addr=rs1;
+						rs2_addr=rs2;
+						rd_addr =5'b0;
+						rd_wen  =1'b0;
+					end
+					3'b100:begin //BLT
+						oh		=7'd7;
 						op1		=rs1_data;
 						op2		=rs2_data;
 						rs1_addr=rs1;
@@ -190,7 +197,7 @@ module id(
 			end
 
 			//U type
-			7'b0110111:begin	//LUI
+			7'b0110111:begin //LUI
 				oh  	=7'd1;
 				op1		=32'b0;
 				op2		=32'b0;
@@ -198,7 +205,6 @@ module id(
 				rs2_addr=5'b0;
 				rd_addr =rd;
 				rd_wen  =1'b1;	
-
 			end
 
 			//J type

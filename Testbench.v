@@ -24,8 +24,7 @@ module Testbench;
 
 
 	initial begin
-		//$readmemh("./inst_txt/rv32ui-p-add.txt", Testbench.RISCV_soc_inst.rom_inst.rom_mem);
-		$readmemh("./inst_txt/rv32ui-p-add.txt", Testbench.RISCV_soc_inst.rom_inst.rom_mem);
+		$readmemh("./inst_txt/rv32ui-p-srai.txt", Testbench.RISCV_soc_inst.rom_inst.rom_mem);
 	end
 
 
@@ -37,9 +36,9 @@ module Testbench;
 	initial begin
 			
 			wait(x26 == 32'b1);
-			#200;
+			#25;
 			if(x27 == 32'b1)begin
-				$display("@@@@ pass add @@@@");
+				$display("@@@@ pass @@@@");
 			end else begin
 				$display("#########fail#########");
 				for(i=0;i<32;i=i+1)begin
@@ -48,13 +47,13 @@ module Testbench;
 			end
 	end
 
-	integer n;
-	initial begin
-		for(n=0;n<1000;n=n+10)begin
-			#10;
-			$display("time:%d, x27:%d", n, x27);
-		end
-	end
+	// integer n;
+	// initial begin
+	// 	for(n=0;n<1000;n=n+10)begin
+	// 		#10;
+	// 		$display("time:%d, x27:%d", n, x27);
+	// 	end
+	// end
 
 	time start_time, end_time;
 	real elapsed_time;
@@ -68,7 +67,6 @@ module Testbench;
 		elapsed_time = (end_time - start_time) / 1000.0; 
 		$display("Time: %0f us", elapsed_time);
 	end
-
 
 
 
