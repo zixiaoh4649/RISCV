@@ -191,8 +191,33 @@ module id(
 						rd_addr =5'b0;
 						rd_wen  =1'b0;
 					end
-
-
+					3'b101:begin //BGE
+						oh		=7'd8;
+						op1		=rs1_data;
+						op2		=rs2_data;
+						rs1_addr=rs1;
+						rs2_addr=rs2;
+						rd_addr =5'b0;
+						rd_wen  =1'b0;
+					end
+					3'b110:begin //BLTU
+						oh		=7'd9;
+						op1		=rs1_data;
+						op2		=rs2_data;
+						rs1_addr=rs1;
+						rs2_addr=rs2;
+						rd_addr =5'b0;
+						rd_wen  =1'b0;
+					end
+					3'b111:begin //BGEU
+						oh		=7'd10;
+						op1		=rs1_data;
+						op2		=rs2_data;
+						rs1_addr=rs1;
+						rs2_addr=rs2;
+						rd_addr =5'b0;
+						rd_wen  =1'b0;
+					end
 				endcase
 			end
 

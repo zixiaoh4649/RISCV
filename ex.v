@@ -82,14 +82,24 @@ module ex(
 					jump_addr2ctrl = ins_addr2ex + imm_jump;
 					jump_en2ctrl = 1'b1;
 				end
-			end
-
-			
+			end			
 			7'd8:begin //BGE
+				if($signed(op1)>=$signed(op2))begin
+					jump_addr2ctrl = ins_addr2ex + imm_jump;
+					jump_en2ctrl = 1'b1;
+				end
 			end
 			7'd9:begin //BLTU
+				if($unsigned(op1)<$unsigned(op2))begin
+					jump_addr2ctrl = ins_addr2ex + imm_jump;
+					jump_en2ctrl = 1'b1;
+				end			
 			end
 			7'd10:begin //BGEU
+				if($unsigned(op1)>=$unsigned(op2))begin
+					jump_addr2ctrl = ins_addr2ex + imm_jump;
+					jump_en2ctrl = 1'b1;
+				end				
 			end
 
 			//I type
