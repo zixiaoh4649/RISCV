@@ -9,7 +9,7 @@ module id_ex(
 	input wire [31:0] ins_addr,
 	input wire [4:0]  rd_addr,
 	input wire 	      rd_wen,
-	input wire [4:0]  oh_in, //oh
+	input wire [6:0]  oh_in, //oh
 	
 	//to ex
 	output wire [31:0] op1_ex,
@@ -18,7 +18,7 @@ module id_ex(
 	output wire [31:0] ins_addr2ex,
 	output wire [4:0]  rd_addr2ex,
 	output wire        rd_wen2ex,
-	output wire [4:0]  oh,
+	output wire [6:0]  oh,
 
 	//hold
 	input wire hold
@@ -32,7 +32,7 @@ module id_ex(
 	
 	dff_set #(32) dff_ins_addr(clk, rst, hold, 32'b0, ins_addr, ins_addr2ex);
 	
-	dff_set #(5) dff_oh(clk, rst, hold, 5'b0, oh_in, oh);
+	dff_set #(7) dff_oh(clk, rst, hold, 7'b0, oh_in, oh);
 	
 	dff_set #(5) dff_rd_addr(clk, rst, hold, 5'b0, rd_addr, rd_addr2ex);
 	

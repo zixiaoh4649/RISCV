@@ -17,7 +17,7 @@ module id(
 	output reg [31:0] ins_addr,
 	output reg [4:0]  rd_addr,    
 	output reg 	      rd_wen,
-	output reg [4:0]  oh
+	output reg [6:0]  oh
 
 			
 );
@@ -48,14 +48,22 @@ module id(
 		
 		ins2ex  =ins;
 		ins_addr=ins_addr2id;
-		
+		//default
+		oh      =7'b0;
+		op1		=32'b0;
+		op2		=32'b0;
+		rs1_addr=5'b0;
+		rs2_addr=5'b0;
+		rd_addr =5'b0;
+		rd_wen  =1'b0;	
+					 
 		case(opcode)
 
 			//I type
 			7'b0010011:begin  
 				case(f3) 
 					3'b000:begin	//ADDI
-						oh  =5'd1;
+						oh  =7'd19;
 						op1	    =rs1_data;
 						op2     ={{20{imm_i[11]}},imm_i};
 						rs1_addr=rs1;
@@ -63,17 +71,28 @@ module id(
 						rd_addr =rd;
 						rd_wen  =1'b1;
 					end
-					default:begin
-						oh  =5'b0;
+					3'b010:begin	//SLTI
+						oh  	=7'd20;
 						op1		=32'b0;
 						op2		=32'b0;
-						rs1_addr=5'b0;
+						rs1_addr=rs1;
 						rs2_addr=5'b0;
-						rd_addr =5'b0;
-						rd_wen  =1'b0;			
+						rd_addr =rd;
+						rd_wen  =1'b1;			
 					end
+					3'b011:begin	//SLTIU
+						oh  	=7'd21;
+						op1		=32'b0;
+						op2		=32'b0;
+						rs1_addr=rs1;
+						rs2_addr=5'b0;
+						rd_addr =rd;
+						rd_wen  =1'b1;			
+					end
+
 				endcase
 			end
+
 
 			//R type
 			7'b0110011:begin 
@@ -81,55 +100,73 @@ module id(
 					3'b000:begin
 						case(f7)
 							7'b0000000:begin //ADD
-								oh      =5'd2;
+								oh      =7'd28;
 								op1	    =rs1_data;
 								op2     =rs2_data;
 								rs1_addr=rs1;
 								rs2_addr=rs2;
 								rd_addr =rd;
 								rd_wen  =1'b1;
-							end
-							
+							end						
 							7'b0100000:begin //SUB
-								oh      =5'd3;
+								oh      =7'd29;
 								op1	    =rs1_data;
 								op2     =rs2_data;
 								rs1_addr=rs1;
 								rs2_addr=rs2;
 								rd_addr =rd;
 								rd_wen  =1'b1;
-							end
-							
-							
-							default:begin
-								oh  =5'b0;
-								op1		=32'b0;
-								op2		=32'b0;
-								rs1_addr=5'b0;
+							end											
+						endcase
+					end
+					3'b001:begin
+						case(f7)
+							7'b0000000:begin //SLLI
+								oh      =7'd25;
+								op1	    =rs1_data;
+								op2     =rs2;
+								rs1_addr=rs1;
 								rs2_addr=5'b0;
-								rd_addr =5'b0;
-								rd_wen  =1'b0;	
+								rd_addr =rd;
+								rd_wen  =1'b1;
 							end
 						endcase
 					end
-					default:begin
-						oh      =5'b0;
-						op1		=32'b0;
-						op2		=32'b0;
-						rs1_addr=5'b0;
-						rs2_addr=5'b0;
-						rd_addr =5'b0;
-						rd_wen  =1'b0;	
-					end 
+					3'b101:begin
+						case(f7)
+							7'b0000000:begin //SRLI
+								oh      =7'd26;
+								op1	    =rs1_data;
+								op2     ={{27'b0}, rs2};
+								rs1_addr=rs1;
+								rs2_addr=5'b0;
+								rd_addr =rd;
+								rd_wen  =1'b1;
+							end
+							7'b0100000:begin //SRAI
+								oh      =7'd27;
+								op1	    =rs1_data;
+								op2     ={{27'b0}, rs2};
+								rs1_addr=rs1;
+								rs2_addr=5'b0;
+								rd_addr =rd;
+								rd_wen  =1'b1;
+							end
+							
+
+
+						endcase
+					end
 					
 				endcase
 			end
+			//R type
 
 			//B type
 			7'b1100011:begin 
 				case(f3)
 					3'b001:begin //BNE
-						oh		=5'd4;
+						oh		=7'd6;
 						op1		=rs1_data;
 						op2		=rs2_data;
 						rs1_addr=rs1;
@@ -139,7 +176,7 @@ module id(
 					end
 
 					3'b000:begin //BEQ
-						oh		=5'd5;
+						oh		=7'd5;
 						op1		=rs1_data;
 						op2		=rs2_data;
 						rs1_addr=rs1;
@@ -153,8 +190,8 @@ module id(
 			end
 
 			//U type
-			7'b0110111:begin
-				oh  	=5'd7;
+			7'b0110111:begin	//LUI
+				oh  	=7'd1;
 				op1		=32'b0;
 				op2		=32'b0;
 				rs1_addr=5'b0;
@@ -166,7 +203,7 @@ module id(
 
 			//J type
 			7'b1101111:begin //JAL
-				oh		=5'd6;
+				oh		=7'd3;
 				op1		=32'b0;
 				op2		=32'b0;
 				rs1_addr=5'b0;
@@ -174,17 +211,7 @@ module id(
 				rd_addr =rd;
 				rd_wen  =1'b1;
 			end
-			
-			default:begin
-				oh  	=5'b0;
-				op1		=32'b0;
-				op2		=32'b0;
-				rs1_addr=5'b0;
-				rs2_addr=5'b0;
-				rd_addr =5'b0;
-				rd_wen  =1'b0;	
-			end							
-		
+					
 		endcase//type
 	
 	end//always
