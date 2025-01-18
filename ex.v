@@ -54,9 +54,9 @@ module ex(
 			end
 
 			//J type
-			7'd3:begin //Jal  needs auipc
-				jump_addr2ctrl = ins_addr2ex + {{12{ins[31]}}, ins[31], ins[19:12], ins[20], ins[30:21], 1'b0};
-				hold2ctrl	   = 1'b0;
+			7'd3:begin //Jal
+				jump_addr2ctrl = ins_addr2ex + {{12{ins[31]}}, ins[19:12], ins[20], ins[30:21], 1'b0};
+				jump_en2ctrl   = 1'b1;
 				rd_data		   = ins_addr2ex + 32'd4;
 				rd_addr        = rd_addr2ex;
 				rd_wen2reg	   = 1'b1;
@@ -64,7 +64,7 @@ module ex(
 
 
 			7'd4:begin //JALR
-				jump_addr2ctrl  = op1 + op2;
+				jump_addr2ctrl  = op1 + op2; //PC
 				jump_en2ctrl    = 1'b1;
 				rd_data			= ins_addr2ex + 32'd4;
 				rd_addr    	 	= rd_addr2ex;

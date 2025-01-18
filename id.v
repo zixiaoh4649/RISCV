@@ -113,6 +113,15 @@ module id(
 				endcase
 			end
 
+			7'b1100111:begin
+			oh 		=7'd4;				
+			op1	    =rs1_data;
+			op2     ={{20{ins[31]}}, ins[31:20]};
+			rs1_addr=rs1;
+			rs2_addr=5'b0;
+			rd_addr =rd;
+			rd_wen  =1'b1;		
+			end
 
 
 
