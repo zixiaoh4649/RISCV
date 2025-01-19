@@ -24,7 +24,7 @@ module Testbench;
 
 
 	initial begin
-		$readmemh("./inst_txt/rv32ui-p-jalr.txt", Testbench.RISCV_soc_inst.rom_inst.rom_mem);
+		$readmemh("./inst_txt/rv32ui-p-bgeu.txt", Testbench.RISCV_soc_inst.rom_inst.rom_mem);
 	end
 
 

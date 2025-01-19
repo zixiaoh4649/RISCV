@@ -28,6 +28,27 @@ module ex(
 	//wire   [31:0] imm_jal;
 	//assign imm_jal = {12{ins[31]}, ins[31], ins[19:12], ins[20], ins[30:21], 1'b0};
 
+	//ALU
+	wire [31:0] op1_add_op2;
+	wire [31:0] op1_and_op2;
+	wire [31:0] op1_or_op2;
+	wire [31:0] op1_xor_op2;
+	wire [31:0] op1_leftshift_op2;
+	wire [31:0] op1_rightshift_op2;
+	assign op1_add_op2 			= op1 + op2;
+	assign op1_and_op2 			= op1 & op2;
+	assign op1_or_op2 			= op1 | op2;
+	assign op1_xor_op2 			= op1 ^ op2;
+	assign op1_leftshift_op2 	= op1 << op2;
+	assign op1_rightshift_op2 	= op1 >> op2;
+	wire op1_unsignedless_op2;
+	wire op1_signedless_op2;
+	assign op1_unsignedless_op2 = $unsigned(op1)<$unsigned(op2);
+	assign op1_signedless_op2   = $signed(op1)<$signed(op2);
+
+	
+
+
 	
 	always @(*) begin
 
@@ -64,7 +85,7 @@ module ex(
 
 
 			7'd4:begin //JALR
-				jump_addr2ctrl  = op1 + op2; //PC
+				jump_addr2ctrl  = op1_add_op2; //PC
 				jump_en2ctrl    = 1'b1;
 				rd_data			= ins_addr2ex + 32'd4;
 				rd_addr    	 	= rd_addr2ex;
@@ -86,25 +107,25 @@ module ex(
 				end
 			end
 			7'd7:begin //BLT
-				if($signed(op1)<$signed(op2))begin
+				if(op1_signedless_op2)begin
 					jump_addr2ctrl = ins_addr2ex + imm_jump;
 					jump_en2ctrl = 1'b1;
 				end
 			end			
 			7'd8:begin //BGE
-				if($signed(op1)>=$signed(op2))begin
+				if(~op1_signedless_op2)begin
 					jump_addr2ctrl = ins_addr2ex + imm_jump;
 					jump_en2ctrl = 1'b1;
 				end
 			end
 			7'd9:begin //BLTU
-				if($unsigned(op1)<$unsigned(op2))begin
+				if(op1_unsignedless_op2)begin
 					jump_addr2ctrl = ins_addr2ex + imm_jump;
 					jump_en2ctrl = 1'b1;
 				end			
 			end
 			7'd10:begin //BGEU
-				if($unsigned(op1)>=$unsigned(op2))begin
+				if(~op1_unsignedless_op2)begin
 					jump_addr2ctrl = ins_addr2ex + imm_jump;
 					jump_en2ctrl = 1'b1;
 				end				
@@ -145,12 +166,12 @@ module ex(
 
 			//I type
 			7'd19:begin //ADDI
-				rd_data    = op1 + op2;
+				rd_data    = op1_add_op2;
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;
 			end
 			7'd20:begin //SLTI
-				if($signed(op1) < $signed(op2))begin
+				if(op1_signedless_op2)begin
 					rd_data    = 32'b1;
 					rd_addr    = rd_addr2ex;
 					rd_wen2reg = 1'b1;
@@ -161,7 +182,7 @@ module ex(
 				end
 			end
 			7'd21:begin //SLTIU
-				if($unsigned(op1) < $unsigned(op2))begin
+				if(op1_unsignedless_op2)begin
 					rd_data    = 32'b1;
 					rd_addr    = rd_addr2ex;
 					rd_wen2reg = 1'b1;
@@ -172,29 +193,29 @@ module ex(
 				end
 			end
 			7'd22:begin //XORI
-				rd_data    = op1 ^ op2;
+				rd_data    = op1_xor_op2;
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;
 			end
 			7'd23:begin //ORI
-				rd_data    = op1 | op2;
+				rd_data    = op1_or_op2;
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;
 			end
 			7'd24:begin //ANDI
-				rd_data    = op1 & op2;
+				rd_data    = op1_and_op2;
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;
 			end
 
 			//R type shamt
 			7'd25:begin //SLLI
-				rd_data    = op1 << op2;
+				rd_data    = op1_leftshift_op2;
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;
 			end
 			7'd26:begin //SRLI
-				rd_data    = op1 >> op2;
+				rd_data    = op1_rightshift_op2;
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;				
 			end
@@ -210,7 +231,7 @@ module ex(
 			//R type shamt
 			//R type
 			7'd28:begin //ADD
-				rd_data    = op1 + op2;
+				rd_data    = op1_add_op2;
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;
 			end
@@ -220,12 +241,12 @@ module ex(
 				rd_wen2reg = 1'b1;
 			end
 			7'd30:begin //SLL
-				rd_data    = op1 << op2;
+				rd_data    = op1_leftshift_op2;
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;
 			end
 			7'd31:begin //SLT
-				if($signed(op1) < $signed(op2))begin
+				if(op1_signedless_op2)begin
 					rd_data = 1'b1;
 				end else begin
 					rd_data = 1'b0;
@@ -234,7 +255,7 @@ module ex(
 				rd_wen2reg = 1'b1;
 			end
 			7'd32:begin //SLTU
-				if($unsigned(op1) < $unsigned(op2))begin
+				if(op1_unsignedless_op2)begin
 					rd_data = 1'b1;
 				end else begin
 					rd_data = 1'b0;
@@ -243,12 +264,12 @@ module ex(
 				rd_wen2reg = 1'b1;
 			end
 			7'd33:begin //XOR
-				rd_data    = op1 ^ op2;
+				rd_data    = op1_xor_op2;
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;
 			end
 			7'd34:begin //SRL
-				rd_data    = op1 >> op2;
+				rd_data    = op1_rightshift_op2;
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;
 			end
@@ -260,12 +281,12 @@ module ex(
 			end			
 			end
 			7'd36:begin //OR
-				rd_data    = op1 | op2;
+				rd_data    = op1_or_op2;
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;
 			end
 			7'd37:begin //AND
-				rd_data    = op1 & op2;
+				rd_data    = op1_and_op2;
 				rd_addr    = rd_addr2ex;
 				rd_wen2reg = 1'b1;
 			end
